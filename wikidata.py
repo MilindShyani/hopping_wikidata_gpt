@@ -29,11 +29,12 @@ def get_linked_ids(wikidata_id):
         SELECT DISTINCT ?item ?itemLabel WHERE {
           wd:""" + wikidata_id + """ ?p ?item .
           ?item wikibase:statements ?st .
+          ?article schema:about ?item ;
+                schema:isPartOf <https://en.wikipedia.org/> .
           SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
         }
         """
     sparql.setQuery(sparql_query)
-
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
 
@@ -48,10 +49,35 @@ def get_linked_ids(wikidata_id):
     return ids_and_labels
 
 
+def get_children(qid,entity,depth):
+    visited = set()
+    to_visit = set()
+    to_visit.add((qid, entity))
+    k = 0
+
+    nodes = {}
+    nodes[k] = to_visit.copy()
+
+    while k < depth:
+        new_visit = set()
+        while to_visit:
+            (id, name) = to_visit.pop()
+            print("yo")
+            if (id, name) not in visited:
+                new_ids_labels = get_linked_ids(id)
+                for nid, nlab in new_ids_labels:
+                    new_visit.add((nid, nlab))
+                visited.add((id, name))
+        to_visit = new_visit
+        k += 1
+        nodes[k] = to_visit.copy()
+    return nodes
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Retrieve Wikidata QID for an entity.')
     parser.add_argument('entity', help='The entity for which to find the Wikidata QID')
+    parser.add_argument('depth', type=int, help='Recursion depth')
     args = parser.parse_args()
 
     entity = args.entity
@@ -61,33 +87,8 @@ if __name__ == '__main__':
     else:
         print(f"No QID found for '{entity}'")
 
-    visited = set()
-    visited.add((qid, entity))
-
-    to_visit = get_linked_ids(qid)
-    k = 0
-
-    while k < 1:
-        new_visit = set()
-        while to_visit:
-            (id, name) = to_visit.pop()
-            if (id,name) not in visited:
-                new_ids_labels = get_linked_ids(id)
-                if len(new_ids_labels) <= 20:
-                    for nid,nlab in new_ids_labels:
-                        new_visit.add((nid, nlab))
-                visited.add((id,name))
-        to_visit = new_visit
-        k += 1
-
-        print(visited, "\n \n \n \n", new_visit)
-
-
-
-
-
-
-
+    nodes = get_children(qid, entity, args.depth)
+    print(nodes)
 
 
 
