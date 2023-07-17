@@ -1,0 +1,5 @@
+The QID for 'Shamit Kachru' is Q368407
+yo
+Removed 16 entities 
+{0: {('Q368407', 'Shamit Kachru')}, 1: {('Q33198', 'string theory'), ('Q41506', 'Stanford University'), ('Q13371', 'Harvard University'), ('Q1860', 'English'), ('Q201513', 'Edward Witten'), ('Q1196649', 'Kashmiri people'), ('Q543413', 'AdS/CFT correspondence'), ('Q21578', 'Princeton University')}}
+{'error': {'message': 'Cannot specify both model and engine', 'type': 'invalid_request_error', 'param': None, 'code': None}}
